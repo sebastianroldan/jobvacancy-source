@@ -9,5 +9,5 @@
 ## Travis Link:
 
 [![Build Status]( https://travis-ci.org/sebastianroldan/jobvacancy-source.svg?branch=master
-)]( https://travis-ci.org/sebastianroldan/jobvacancy-source.svg?branch=master
+)]( https://travis-ci.org/sebastianroldan/jobvacancy-source
 )
