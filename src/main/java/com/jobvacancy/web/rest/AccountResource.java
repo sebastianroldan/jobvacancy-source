@@ -1,7 +1,6 @@
 package com.jobvacancy.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import com.jobvacancy.domain.Authority;
 import com.jobvacancy.domain.PersistentToken;
 import com.jobvacancy.domain.User;
 import com.jobvacancy.repository.PersistentTokenRepository;
@@ -25,7 +24,6 @@ import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * REST controller for managing the current user's account.

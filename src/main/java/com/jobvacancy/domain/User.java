@@ -19,6 +19,7 @@ import org.joda.time.DateTime;
 /**
  * A user.
  */
+@SuppressWarnings("serial")
 @Entity
 @Table(name = "JHI_USER")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)

@@ -6,13 +6,12 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Objects;
 
 /**
  * A JobOffer.
  */
+@SuppressWarnings("serial")
 @Entity
 @Table(name = "JOB_OFFER")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
@@ -32,9 +31,12 @@ public class JobOffer implements Serializable {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "tags")
+    private String tags; 
+
     @ManyToOne
     private User owner;
-
+    
     public Long getId() {
         return id;
     }
@@ -65,6 +67,14 @@ public class JobOffer implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+    
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
     }
 
     public User getOwner() {
@@ -105,4 +115,16 @@ public class JobOffer implements Serializable {
                 ", description='" + description + "'" +
                 '}';
     }
+
+	public boolean hasTags() {
+		return (tags.length()>0);
+	}
+
+	public int numberOfTags() {
+		if (tags.isEmpty()){
+			return 0;
+		}else{
+			return tags.split(",").length;
+		}
+	}
 }

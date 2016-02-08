@@ -1,19 +1,17 @@
 package com.jobvacancy.web.rest;
 
 import com.jobvacancy.Application;
-import com.jobvacancy.domain.Authority;
 import com.jobvacancy.domain.JobOffer;
 import com.jobvacancy.domain.User;
 import com.jobvacancy.repository.JobOfferRepository;
 
 import com.jobvacancy.repository.UserRepository;
-import com.jobvacancy.security.AuthoritiesConstants;
-import com.jobvacancy.service.MailService;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.hamcrest.Matchers.hasItem;
+import static org.junit.Assert.*;
 
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -23,12 +21,8 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
-import org.springframework.mock.web.MockHttpSession;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -38,11 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -68,9 +59,6 @@ public class JobOfferResourceTest {
     private static final String UPDATED_DESCRIPTION = "UPDATED_TEXT";
 
     @Inject
-    private PasswordEncoder passwordEncoder;
-
-    @Inject
     private UserRepository userRepository;
 
     @Mock
@@ -88,9 +76,6 @@ public class JobOfferResourceTest {
     private MockMvc restJobOfferMockMvc;
 
     private JobOffer jobOffer;
-    private User user;
-
-
     @PostConstruct
     public void setup() {
         MockitoAnnotations.initMocks(this);
@@ -158,6 +143,31 @@ public class JobOfferResourceTest {
         assertThat(testJobOffer.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
     }
 
+    @Test
+    @Transactional
+    public void createJobOfferWithoutTags() throws Exception {
+        int databaseSizeBeforeCreate = jobOfferRepository.findAll().size();
+
+        // Create the JobOffer
+        jobOffer.setTags("");
+        restJobOfferMockMvc.perform(post("/api/jobOffers")
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(jobOffer)))
+                .andExpect(status().isCreated());
+
+      
+        // Validate the JobOffer in the database
+        
+        List<JobOffer> jobOffers = jobOfferRepository.findAll();
+        assertThat(jobOffers).hasSize(databaseSizeBeforeCreate + 1);
+        JobOffer testJobOffer = jobOffers.get(jobOffers.size() - 1);
+        assertThat(testJobOffer.getTitle()).isEqualTo(DEFAULT_TITLE);
+        assertThat(testJobOffer.getLocation()).isEqualTo(DEFAULT_LOCATION);
+        assertThat(testJobOffer.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
+        assertEquals(0,testJobOffer.numberOfTags());
+        assertFalse(testJobOffer.hasTags());
+    }
+    
     @Test
     @Transactional
     public void checkTitleIsRequired() throws Exception {
