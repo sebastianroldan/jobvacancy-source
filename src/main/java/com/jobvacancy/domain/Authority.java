@@ -13,6 +13,7 @@ import java.io.Serializable;
 /**
  * An authority (a security role) used by Spring Security.
  */
+@SuppressWarnings("serial")
 @Entity
 @Table(name = "JHI_AUTHORITY")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)

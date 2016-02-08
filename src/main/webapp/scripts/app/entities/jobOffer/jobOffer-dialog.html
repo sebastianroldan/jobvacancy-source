@@ -37,8 +37,13 @@
             <input type="text" class="form-control" name="description" id="field_description"
                     ng-model="jobOffer.description"
                     >
+        </div>  
+        <div class="form-group">
+            <label for="field_tags">Tags</label>
+            <input type="text" class="form-control" name="tags" id="field_tags"
+                    ng-model="jobOffer.tags"
+                    >
         </div>
-
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="clear()">

@@ -19,6 +19,7 @@ import java.io.Serializable;
  *
  * @see com.jobvacancy.security.CustomPersistentRememberMeServices
  */
+@SuppressWarnings("serial")
 @Entity
 @Table(name = "JHI_PERSISTENT_TOKEN")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)

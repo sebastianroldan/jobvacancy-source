@@ -8,7 +8,6 @@ import com.jobvacancy.repository.UserRepository;
 import com.jobvacancy.security.AuthoritiesConstants;
 import com.jobvacancy.service.UserService;
 import com.jobvacancy.web.rest.dto.ManagedUserDTO;
-import com.jobvacancy.web.rest.dto.UserDTO;
 import com.jobvacancy.web.rest.util.HeaderUtil;
 import com.jobvacancy.web.rest.util.PaginationUtil;
 import org.slf4j.Logger;
