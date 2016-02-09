@@ -127,4 +127,14 @@ public class JobOffer implements Serializable {
 			return tags.split(",").length;
 		}
 	}
+	
+	public String[] tagArray(){
+		int lengthArray = tags.split(",").length;
+		String[] tagArray = new String[lengthArray];
+		tagArray = tags.split(",");
+		for (int i=1; i< tagArray.length; i++){
+			tagArray[i]=tagArray[i].substring(1);
+		}
+		return tagArray;
+	}
 }

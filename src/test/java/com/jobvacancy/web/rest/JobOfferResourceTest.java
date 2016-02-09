@@ -146,7 +146,7 @@ public class JobOfferResourceTest {
     @Test
     @Transactional
     public void createJobOfferWithoutTags() throws Exception {
-        int databaseSizeBeforeCreate = jobOfferRepository.findAll().size();
+        jobOfferRepository.findAll().size();
 
         // Create the JobOffer
         jobOffer.setTags("");
@@ -154,18 +154,52 @@ public class JobOfferResourceTest {
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
                 .content(TestUtil.convertObjectToJsonBytes(jobOffer)))
                 .andExpect(status().isCreated());
-
-      
-        // Validate the JobOffer in the database
         
         List<JobOffer> jobOffers = jobOfferRepository.findAll();
-        assertThat(jobOffers).hasSize(databaseSizeBeforeCreate + 1);
         JobOffer testJobOffer = jobOffers.get(jobOffers.size() - 1);
-        assertThat(testJobOffer.getTitle()).isEqualTo(DEFAULT_TITLE);
-        assertThat(testJobOffer.getLocation()).isEqualTo(DEFAULT_LOCATION);
-        assertThat(testJobOffer.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
         assertEquals(0,testJobOffer.numberOfTags());
         assertFalse(testJobOffer.hasTags());
+    }
+    
+    @Test
+    @Transactional
+    public void createJobOfferWithOneTag() throws Exception {
+        jobOfferRepository.findAll().size();
+
+        // Create the JobOffer
+        jobOffer.setTags("java");
+        restJobOfferMockMvc.perform(post("/api/jobOffers")
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(jobOffer)))
+                .andExpect(status().isCreated());
+        
+        List<JobOffer> jobOffers = jobOfferRepository.findAll();
+        JobOffer testJobOffer = jobOffers.get(jobOffers.size() - 1);
+        assertEquals(1,testJobOffer.numberOfTags());
+        assertTrue(testJobOffer.hasTags());
+        assertEquals("java",testJobOffer.tagArray()[0]);
+    }
+    
+    @Test
+    @Transactional
+    public void createJobOfferWithMoreThanOneTag() throws Exception {
+        jobOfferRepository.findAll().size();
+
+        // Create the JobOffer
+        jobOffer.setTags("java, spring, hibernate");
+        restJobOfferMockMvc.perform(post("/api/jobOffers")
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(jobOffer)))
+                .andExpect(status().isCreated());
+
+        List<JobOffer> jobOffers = jobOfferRepository.findAll();
+        JobOffer testJobOffer = jobOffers.get(jobOffers.size() - 1);
+        
+        assertEquals(3,testJobOffer.numberOfTags());
+        assertTrue(testJobOffer.hasTags());
+        assertEquals("java",testJobOffer.tagArray()[0]);
+        assertEquals("spring",testJobOffer.tagArray()[1]);
+        assertEquals("hibernate",testJobOffer.tagArray()[2]);
     }
     
     @Test
@@ -185,7 +219,7 @@ public class JobOfferResourceTest {
         List<JobOffer> jobOffers = jobOfferRepository.findAll();
         assertThat(jobOffers).hasSize(databaseSizeBeforeTest);
     }
-
+    
     @Test
     @Ignore
     @Transactional
