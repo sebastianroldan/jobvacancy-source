@@ -41,8 +41,10 @@
         <div class="form-group">
             <label for="field_tags">Tags</label>
             <input type="text" class="form-control" name="tags" id="field_tags"
-                    ng-model="jobOffer.tags"
+                    ng-model="jobOffer.tags"  ng-pattern="regex"
                     >
+            <div class="custom-error"  ng-show="editForm.tags.$error.pattern">
+                    Not a valid tag, only one word or words separate by comma ej. java, project manager, spring</div>
         </div>
     </div>
     <div class="modal-footer">

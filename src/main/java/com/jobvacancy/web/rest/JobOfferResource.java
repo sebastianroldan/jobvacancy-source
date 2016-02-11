@@ -54,6 +54,9 @@ public class JobOfferResource {
         if (jobOffer.getId() != null) {
             return ResponseEntity.badRequest().header("Failure", "A new jobOffer cannot already have an ID").body(null);
         }
+        if (!jobOffer.validate()) {
+            return ResponseEntity.badRequest().header("Failure", "Tags arguments is not validate").body(null);
+        }
         String currentLogin = SecurityUtils.getCurrentLogin();
         Optional<User> currentUser = userRepository.findOneByLogin(currentLogin);
         jobOffer.setOwner(currentUser.get());

@@ -7,6 +7,8 @@ import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.regex.*;
+import java.util.regex.Pattern;
 
 /**
  * A JobOffer.
@@ -74,7 +76,7 @@ public class JobOffer implements Serializable {
     }
 
     public void setTags(String tags) {
-        this.tags = tags;
+        	this.tags = tags;
     }
 
     public User getOwner() {
@@ -136,5 +138,13 @@ public class JobOffer implements Serializable {
 			tagArray[i]=tagArray[i].substring(1);
 		}
 		return tagArray;
+	}
+
+	public boolean validate() {
+		if (tags == null){
+			tags = "";
+		}
+		Pattern regex = Pattern.compile("(\\w+(\\s\\w+)*(\\,\\s\\w+(\\s\\w+)*)*)|\\w+(\\s\\w+)*|\\s+");
+        return regex.matcher(tags).matches()||!this.hasTags();
 	}
 }
