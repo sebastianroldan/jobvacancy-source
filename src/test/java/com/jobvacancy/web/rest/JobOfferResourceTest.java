@@ -7,10 +7,8 @@ import com.jobvacancy.repository.JobOfferRepository;
 
 import com.jobvacancy.repository.UserRepository;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.*;
 
 import org.mockito.Mock;
@@ -76,6 +74,7 @@ public class JobOfferResourceTest {
     private MockMvc restJobOfferMockMvc;
 
     private JobOffer jobOffer;
+
     @PostConstruct
     public void setup() {
         MockitoAnnotations.initMocks(this);
@@ -91,7 +90,6 @@ public class JobOfferResourceTest {
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
     }
-
 
     @Before
     public void initTest() {
@@ -178,7 +176,7 @@ public class JobOfferResourceTest {
         JobOffer testJobOffer = jobOffers.get(jobOffers.size() - 1);
         assertEquals(1,testJobOffer.numberOfTags());
         assertTrue(testJobOffer.hasTags());
-        assertEquals("java",testJobOffer.tagArray()[0]);
+        assertEquals("java",testJobOffer.tagList().get(0));
     }
     
     @Test
@@ -198,9 +196,9 @@ public class JobOfferResourceTest {
         
         assertEquals(3,testJobOffer.numberOfTags());
         assertTrue(testJobOffer.hasTags());
-        assertEquals("java",testJobOffer.tagArray()[0]);
-        assertEquals("spring",testJobOffer.tagArray()[1]);
-        assertEquals("hibernate",testJobOffer.tagArray()[2]);
+        assertEquals("java",testJobOffer.tagList().get(0));
+        assertEquals("spring",testJobOffer.tagList().get(1));
+        assertEquals("hibernate",testJobOffer.tagList().get(2));
     }
 
     @Test
@@ -220,8 +218,8 @@ public class JobOfferResourceTest {
         
         assertEquals(2,testJobOffer.numberOfTags());
         assertTrue(testJobOffer.hasTags());
-        assertEquals("Google Maps",testJobOffer.tagArray()[0]);
-        assertEquals("Games",testJobOffer.tagArray()[1]);
+        assertEquals("Google Maps",testJobOffer.tagList().get(0));
+        assertEquals("Games",testJobOffer.tagList().get(1));
     }
 
     @Test
@@ -241,15 +239,15 @@ public class JobOfferResourceTest {
         
         assertEquals(4,testJobOffer.numberOfTags());
         assertTrue(testJobOffer.hasTags());
-        assertEquals("Apps",testJobOffer.tagArray()[0]);
-        assertEquals("google maps",testJobOffer.tagArray()[1]);
-        assertEquals("git",testJobOffer.tagArray()[2]);
-        assertEquals("project manager",testJobOffer.tagArray()[3]);
+        assertEquals("Apps",testJobOffer.tagList().get(0));
+        assertEquals("google maps",testJobOffer.tagList().get(1));
+        assertEquals("git",testJobOffer.tagList().get(2));
+        assertEquals("project manager",testJobOffer.tagList().get(3));
     }
     
     @Test
     @Transactional
-    public void checkTagsWhitSpecialCharsAreNotValidate() throws Exception {
+    public void checkTagsWithSpecialCharsAreNotValidate() throws Exception {
         int databaseSizeBeforeTest = jobOfferRepository.findAll().size();
         // set the field tags
         jobOffer.setTags("%&/");
@@ -338,20 +336,27 @@ public class JobOfferResourceTest {
     }
     
     @Test
-    @Ignore
     @Transactional
-    public void getAllJobOffers() throws Exception {
+    public void searchSimpleWordJava() throws Exception {
+
+    	JobOffer jobOffer2 = new JobOffer();
+    	jobOffer2.setTitle("Tester");
+        jobOffer2.setLocation("Lanus");
+        jobOffer2.setDescription("Junit");
+        jobOffer2.setTags("java");
+    	
         // Initialize the database
         jobOfferRepository.saveAndFlush(jobOffer);
+        jobOfferRepository.saveAndFlush(jobOffer2);
 
-        // Get all the jobOffers
-        restJobOfferMockMvc.perform(get("/api/jobOffers"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(jobOffer.getId().intValue())))
-                .andExpect(jsonPath("$.[*].title").value(hasItem(DEFAULT_TITLE.toString())))
-                .andExpect(jsonPath("$.[*].location").value(hasItem(DEFAULT_LOCATION.toString())))
-                .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION.toString())));
+        JobOfferResource resource = new JobOfferResource();
+        List<JobOffer> list = jobOfferRepository.findAll();
+        List<JobOffer> listJobOffer = resource.search(list,"java");
+        assertEquals("Tester",listJobOffer.get(0).getTitle());
+        assertEquals("Lanus",listJobOffer.get(0).getLocation());
+        assertEquals("Junit",listJobOffer.get(0).getDescription());
+        assertTrue(listJobOffer.size()==1);
+        
     }
 
     @Test

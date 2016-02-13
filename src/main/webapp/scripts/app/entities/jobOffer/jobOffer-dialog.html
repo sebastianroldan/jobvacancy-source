@@ -1,4 +1,3 @@
-
 <form name="editForm" role="form" novalidate ng-submit="save()" show-validation>
 
     <div class="modal-header">
@@ -8,12 +7,6 @@
     </div>
     <div class="modal-body">
         <jh-alert-error></jh-alert-error>
-<!--
-        <div class="form-group">
-            <input type="hidden" class="form-control" id="id" name="id"
-                    ng-model="jobOffer.id" readonly>
-        </div>
--->
         <div class="form-group">
             <label for="field_title">Title</label>
             <input type="text" class="form-control" name="title" id="field_title"
@@ -44,7 +37,8 @@
                     ng-model="jobOffer.tags"  ng-pattern="regex"
                     >
             <div class="custom-error"  ng-show="editForm.tags.$error.pattern">
-                    Not a valid tag, only one word or words separate by comma ej. java, project manager, spring</div>
+                    Not a valid tag, only one word or words separate by comma ej. java, project manager, spring
+            </div>
         </div>
     </div>
     <div class="modal-footer">

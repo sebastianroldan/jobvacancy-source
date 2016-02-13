@@ -3,12 +3,11 @@
     <jh-alert></jh-alert>
     <div class="container">
         <div class="row">
-            <div class="col-md-4">
-                <!--
-                <button class="btn btn-primary" ui-sref="jobOffer.new">
-                    <span class="glyphicon glyphicon-flash"></span> <span>Create a new JobOffer</span>
+           	<div class="col-md-4 col-md-offset-8">
+            	<input type="text" name="word"  ng-model="word"  ng-pattern="regex">
+                <button class="btn btn-primary" ng-click="search(links['first'])"  ui-sref="jobOffer.search">
+                    <span class="glyphicon glyphicon-flash"></span> <span>Search a job</span>
                 </button>
-                -->
             </div>
         </div>
     </div>
@@ -29,13 +28,6 @@
                 <td>{{jobOffer.location}}</td>
                 <td>{{jobOffer.description}}</td>
                 <td>
-                    <!--
-                    <button type="submit"
-                            ui-sref="jobOffer.detail({id:jobOffer.id})"
-                            class="btn btn-info btn-sm">
-                        <span class="glyphicon glyphicon-eye-open"></span>&nbsp;<span> View</span>
-                    </button>
-                    -->
                     <button type="submit"
                             ui-sref="application({id:jobOffer.id})"
                             class="btn btn-primary btn-sm">
@@ -55,40 +47,3 @@
         </nav>
     </div>
 </div>
-
-<!--
-<h1>Current Job Offers</h1>
-
-<div class="search-box">
-    <form method="POST" action="search" class="form-search">
-        <input type="text" name="q" />
-        <input type="submit" value="search" id="search-button" class="btn btn-primary"/>
-    </form>
-</div>
-
-<table class="table table-bordered">
-    <tr>
-        <th>Title</th>
-        <th>Location</th>
-        <th>Description</th>
-        <th>Actions</th>
-    </tr>
-
-    <tr>
-        <td>
-                programador
-        </td>
-        <td>
-            ubicacion
-        </td>
-        <td>
-           descripcion
-        </td>
-        <td>
-           apply
-        </td>
-    </tr>
-
-
-</table>
--->
