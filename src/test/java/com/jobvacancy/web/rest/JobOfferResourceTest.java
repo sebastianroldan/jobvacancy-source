@@ -74,7 +74,8 @@ public class JobOfferResourceTest {
     private MockMvc restJobOfferMockMvc;
 
     private JobOffer jobOffer;
-
+    private JobOffer jobOffer2;
+    
     @PostConstruct
     public void setup() {
         MockitoAnnotations.initMocks(this);
@@ -98,6 +99,11 @@ public class JobOfferResourceTest {
         jobOffer.setLocation(DEFAULT_LOCATION);
         jobOffer.setDescription(DEFAULT_DESCRIPTION);
         jobOffer.setTags("");
+        jobOffer2 = new JobOffer();
+    	jobOffer2.setTitle("Tester");
+        jobOffer2.setLocation("Lanus");
+        jobOffer2.setDescription("Junit");
+
     }
 
     public static class MockSecurityContext implements SecurityContext {
@@ -372,7 +378,6 @@ public class JobOfferResourceTest {
         jobOffer.setLocation(UPDATED_LOCATION);
         jobOffer.setDescription(UPDATED_DESCRIPTION);
 
-
         restJobOfferMockMvc.perform(put("/api/jobOffers")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
                 .content(TestUtil.convertObjectToJsonBytes(jobOffer)))
@@ -409,10 +414,6 @@ public class JobOfferResourceTest {
     @Transactional
     public void searchSimpleWordJava() throws Exception {
 
-    	JobOffer jobOffer2 = new JobOffer();
-    	jobOffer2.setTitle("Tester");
-        jobOffer2.setLocation("Lanus");
-        jobOffer2.setDescription("Junit");
         jobOffer2.setTags("java");
     	
         // Initialize the database
@@ -432,10 +433,6 @@ public class JobOfferResourceTest {
     @Transactional
     public void searchAWordWithCapitalLetters() throws Exception {
 
-    	JobOffer jobOffer2 = new JobOffer();
-    	jobOffer2.setTitle("Test");
-        jobOffer2.setLocation("Quilmes");
-        jobOffer2.setDescription("Junit");
         jobOffer2.setTags("java, hibernate, JUNIT");
         
         // Initialize the database
@@ -446,17 +443,79 @@ public class JobOfferResourceTest {
         List<JobOffer> list = jobOfferRepository.findAll();
         List<JobOffer> listJobOffer = resource.search(list,"junit");
         
+        assertEquals("Tester",listJobOffer.get(0).getTitle());
+        assertEquals("Lanus",listJobOffer.get(0).getLocation());
+        assertEquals("Junit",listJobOffer.get(0).getDescription());
+        assertTrue(listJobOffer.size()==1);
+    }
+    
+    @Test
+    @Transactional
+    public void searchAWordWithCapitalLettersBetween() throws Exception {
+
+    	jobOffer.setTags("android, iOs");
+        jobOffer2.setTags("apps, web, IOS, android");
+        
+        // Initialize the database
+        jobOfferRepository.saveAndFlush(jobOffer);
+        jobOfferRepository.saveAndFlush(jobOffer2);
+
+        JobOfferResource resource = new JobOfferResource();
+        List<JobOffer> list = jobOfferRepository.findAll();
+        List<JobOffer> listJobOffer = resource.search(list,"IOS");
+
+        assertEquals("Tester",listJobOffer.get(1).getTitle());
+        assertEquals("Lanus",listJobOffer.get(1).getLocation());
+        assertEquals("Junit",listJobOffer.get(1).getDescription());
+        assertTrue(listJobOffer.size()==2);
+        assertThat(listJobOffer.get(0).getTitle()).isEqualTo(DEFAULT_TITLE);
+        assertThat(listJobOffer.get(0).getLocation()).isEqualTo(DEFAULT_LOCATION);
+        assertThat(listJobOffer.get(0).getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
+    }
+    
+    @Test
+    @Transactional
+    public void searchAWordWithWhiteSpacesBetween() throws Exception {
+
+    	JobOffer jobOffer2 = new JobOffer();
+    	jobOffer2.setTitle("Test");
+        jobOffer2.setLocation("Quilmes");
+        jobOffer2.setDescription("Junit");
+        jobOffer2.setTags("java, hibernate, project manajer");
+        
+        // Initialize the database
+        jobOfferRepository.saveAndFlush(jobOffer);
+        jobOfferRepository.saveAndFlush(jobOffer2);
+
+        JobOfferResource resource = new JobOfferResource();
+        List<JobOffer> list = jobOfferRepository.findAll();
+        List<JobOffer> listJobOffer = resource.search(list,"PROJECT MANAJER");
+        
         assertEquals("Test",listJobOffer.get(0).getTitle());
         assertEquals("Quilmes",listJobOffer.get(0).getLocation());
         assertEquals("Junit",listJobOffer.get(0).getDescription());
         assertTrue(listJobOffer.size()==1);
         
-        jobOffer.setTags("android, iOs");
-        jobOffer2.setTags("apps, web, IOS, android");
-        listJobOffer = resource.search(list,"IOS");
+    }
+    
+    
+    @Test
+    @Transactional
+    public void searchASingleWordSeparateWhiteSpacesBetween() throws Exception {
+
+        jobOffer2.setTags("apps, web, Unit Test, android");
+        jobOffer.setTags("android, unit TEST");
         
-        assertEquals("Test",listJobOffer.get(1).getTitle());
-        assertEquals("Quilmes",listJobOffer.get(1).getLocation());
+        // Initialize the database
+        jobOfferRepository.saveAndFlush(jobOffer);
+        jobOfferRepository.saveAndFlush(jobOffer2);
+
+        JobOfferResource resource = new JobOfferResource();
+        List<JobOffer> list = jobOfferRepository.findAll();
+        List<JobOffer> listJobOffer = resource.search(list,"an droid");           
+        
+        assertEquals("Tester",listJobOffer.get(1).getTitle());
+        assertEquals("Lanus",listJobOffer.get(1).getLocation());
         assertEquals("Junit",listJobOffer.get(1).getDescription());
         assertTrue(listJobOffer.size()==2);
         assertThat(listJobOffer.get(0).getTitle()).isEqualTo(DEFAULT_TITLE);

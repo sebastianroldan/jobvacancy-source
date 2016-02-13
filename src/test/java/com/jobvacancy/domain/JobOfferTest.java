@@ -78,4 +78,10 @@ public class JobOfferTest {
 		assertFalse(jobOffer.contain("angular"));
 		assertFalse(jobOffer.contain("jquery"));
 	}
+	
+	@Test
+	public void supressWhiteSpacesTest(){
+		String sinespacios = jobOffer.supressWhiteSpaces("boca juniors");
+		assertEquals("bocajuniors",sinespacios);
+	}
 }
