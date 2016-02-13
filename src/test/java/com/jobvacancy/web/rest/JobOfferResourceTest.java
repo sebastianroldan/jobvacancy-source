@@ -337,30 +337,6 @@ public class JobOfferResourceTest {
     
     @Test
     @Transactional
-    public void searchSimpleWordJava() throws Exception {
-
-    	JobOffer jobOffer2 = new JobOffer();
-    	jobOffer2.setTitle("Tester");
-        jobOffer2.setLocation("Lanus");
-        jobOffer2.setDescription("Junit");
-        jobOffer2.setTags("java");
-    	
-        // Initialize the database
-        jobOfferRepository.saveAndFlush(jobOffer);
-        jobOfferRepository.saveAndFlush(jobOffer2);
-
-        JobOfferResource resource = new JobOfferResource();
-        List<JobOffer> list = jobOfferRepository.findAll();
-        List<JobOffer> listJobOffer = resource.search(list,"java");
-        assertEquals("Tester",listJobOffer.get(0).getTitle());
-        assertEquals("Lanus",listJobOffer.get(0).getLocation());
-        assertEquals("Junit",listJobOffer.get(0).getDescription());
-        assertTrue(listJobOffer.size()==1);
-        
-    }
-
-    @Test
-    @Transactional
     public void getJobOffer() throws Exception {
         // Initialize the database
         jobOfferRepository.saveAndFlush(jobOffer);
@@ -427,5 +403,64 @@ public class JobOfferResourceTest {
         // Validate the database is empty
         List<JobOffer> jobOffers = jobOfferRepository.findAll();
         assertThat(jobOffers).hasSize(databaseSizeBeforeDelete - 1);
+    }
+    
+    @Test
+    @Transactional
+    public void searchSimpleWordJava() throws Exception {
+
+    	JobOffer jobOffer2 = new JobOffer();
+    	jobOffer2.setTitle("Tester");
+        jobOffer2.setLocation("Lanus");
+        jobOffer2.setDescription("Junit");
+        jobOffer2.setTags("java");
+    	
+        // Initialize the database
+        jobOfferRepository.saveAndFlush(jobOffer);
+        jobOfferRepository.saveAndFlush(jobOffer2);
+
+        JobOfferResource resource = new JobOfferResource();
+        List<JobOffer> list = jobOfferRepository.findAll();
+        List<JobOffer> listJobOffer = resource.search(list,"java");
+        assertEquals("Tester",listJobOffer.get(0).getTitle());
+        assertEquals("Lanus",listJobOffer.get(0).getLocation());
+        assertEquals("Junit",listJobOffer.get(0).getDescription());
+        assertTrue(listJobOffer.size()==1);   
+    }
+    
+    @Test
+    @Transactional
+    public void searchAWordWithCapitalLetters() throws Exception {
+
+    	JobOffer jobOffer2 = new JobOffer();
+    	jobOffer2.setTitle("Test");
+        jobOffer2.setLocation("Quilmes");
+        jobOffer2.setDescription("Junit");
+        jobOffer2.setTags("java, hibernate, JUNIT");
+        
+        // Initialize the database
+        jobOfferRepository.saveAndFlush(jobOffer);
+        jobOfferRepository.saveAndFlush(jobOffer2);
+
+        JobOfferResource resource = new JobOfferResource();
+        List<JobOffer> list = jobOfferRepository.findAll();
+        List<JobOffer> listJobOffer = resource.search(list,"junit");
+        
+        assertEquals("Test",listJobOffer.get(0).getTitle());
+        assertEquals("Quilmes",listJobOffer.get(0).getLocation());
+        assertEquals("Junit",listJobOffer.get(0).getDescription());
+        assertTrue(listJobOffer.size()==1);
+        
+        jobOffer.setTags("android, iOs");
+        jobOffer2.setTags("apps, web, IOS, android");
+        listJobOffer = resource.search(list,"IOS");
+        
+        assertEquals("Test",listJobOffer.get(1).getTitle());
+        assertEquals("Quilmes",listJobOffer.get(1).getLocation());
+        assertEquals("Junit",listJobOffer.get(1).getDescription());
+        assertTrue(listJobOffer.size()==2);
+        assertThat(listJobOffer.get(0).getTitle()).isEqualTo(DEFAULT_TITLE);
+        assertThat(listJobOffer.get(0).getLocation()).isEqualTo(DEFAULT_LOCATION);
+        assertThat(listJobOffer.get(0).getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
     }
 }

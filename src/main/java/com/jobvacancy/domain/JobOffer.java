@@ -153,6 +153,14 @@ public class JobOffer implements Serializable {
 	}
 
 	public boolean contain(String word) {
-		return (this.tagList().contains(word));
+		return (this.upperCaseTags().contains(word.toUpperCase()));
+	}
+	
+	private List<String> upperCaseTags(){
+		List<String> list = new LinkedList<String>();
+		for (String tag:this.tagList()){
+			list.add(tag.toUpperCase());
+		}
+		return list;
 	}
 }
