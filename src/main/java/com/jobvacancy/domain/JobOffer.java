@@ -153,16 +153,24 @@ public class JobOffer implements Serializable {
 	}
 
 	public boolean contain(String word) {
-		return (this.upperCaseAndSuppresWhiteSpacesTags().contains(
-							this.supressWhiteSpaces(word).toUpperCase()));
+		return (containTag(word)||containTitle(word));
 	}
 	
-	private List<String> upperCaseAndSuppresWhiteSpacesTags(){
+	private boolean containTitle(String word) {
+		return this.getTitle().toUpperCase().equals(word.toUpperCase());
+	}
+
+	private boolean containTag(String word){
+		return this.upperCaseAndSuppresWhiteSpacesListAWords(this.tagList()).contains(
+				this.supressWhiteSpaces(word).toUpperCase());
+	}
+	
+	private List<String> upperCaseAndSuppresWhiteSpacesListAWords(List<String> words){
 		List<String> list = new LinkedList<String>();
-		String modifiedTag;
-		for (String tag:this.tagList()){
-			modifiedTag = supressWhiteSpaces(tag);
-			list.add(modifiedTag.toUpperCase());
+		String modifiedWord;
+		for (String word:words){
+			modifiedWord = supressWhiteSpaces(word);
+			list.add(modifiedWord.toUpperCase());
 		}
 		return list;
 	}
