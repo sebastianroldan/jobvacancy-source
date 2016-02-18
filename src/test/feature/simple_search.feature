@@ -32,4 +32,3 @@ Feature: Como usuario quiero poder hacer búsquedas simples por tag (un solo tag
 		And la oferta Y posee los tags "spring", "JAVa"
 		When la busqueda es realizada
 		Then ambas ofertas se muestran en los resultados.
-		
