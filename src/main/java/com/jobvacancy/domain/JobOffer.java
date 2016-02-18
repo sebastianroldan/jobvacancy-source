@@ -2,7 +2,6 @@ package com.jobvacancy.domain;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.io.Serializable;
@@ -157,7 +156,7 @@ public class JobOffer implements Serializable {
 	}
 	
 	private boolean containTitle(String word) {
-		return this.getTitle().toUpperCase().equals(word.toUpperCase());
+		return titleWordList().contains(word.toUpperCase());
 	}
 
 	private boolean containTag(String word){
@@ -172,6 +171,20 @@ public class JobOffer implements Serializable {
 			modifiedWord = supressWhiteSpaces(word);
 			list.add(modifiedWord.toUpperCase());
 		}
+		return list;
+	}
+
+	private List<String> titleWordList(){
+		return convertToUpperCaseList(this.getTitle());
+	}
+	
+	private List<String> convertToUpperCaseList(String title) {
+		List<String> list = new LinkedList<String>();
+		String[] array = title.split("\\s+");
+		for (int i=0;i< array.length; i++){
+			array[i]=array[i].toUpperCase();
+		}
+		list = Arrays.asList(array);
 		return list;
 	}
 

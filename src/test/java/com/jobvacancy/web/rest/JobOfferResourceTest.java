@@ -103,6 +103,7 @@ public class JobOfferResourceTest {
     	jobOffer2.setTitle("Tester");
         jobOffer2.setLocation("Lanus");
         jobOffer2.setDescription("Junit");
+        jobOffer2.setTags("");
 
     }
 
@@ -545,4 +546,24 @@ public class JobOfferResourceTest {
         assertTrue(listJobOffer.size()==1);
     }
     
+    @Test
+    @Transactional
+    public void searchAWordIncludeInTitleComplex() throws Exception {
+
+        jobOffer2.setTags("apps");
+        jobOffer2.setTitle("Aplicaciones Movil");
+        
+        // Initialize the database
+        jobOfferRepository.saveAndFlush(jobOffer);
+        jobOfferRepository.saveAndFlush(jobOffer2);
+
+        JobOfferResource resource = new JobOfferResource();
+        List<JobOffer> list = jobOfferRepository.findAll();
+        List<JobOffer> listJobOffer = resource.search(list,"Movil");           
+        
+        assertEquals("Aplicaciones Movil",listJobOffer.get(0).getTitle());
+        assertEquals("Lanus",listJobOffer.get(0).getLocation());
+        assertEquals("Junit",listJobOffer.get(0).getDescription());
+        assertTrue(listJobOffer.size()==1);
+    }
 }

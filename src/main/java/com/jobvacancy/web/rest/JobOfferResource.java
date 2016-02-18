@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 /**
  * REST controller for managing JobOffer.
@@ -224,7 +225,7 @@ public class JobOfferResource {
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
 
-    public List<JobOffer> search(List<JobOffer> allJobs, String word){
+	public List<JobOffer> search(List<JobOffer> allJobs, String word){
     	List<JobOffer> lista = new LinkedList<JobOffer>();
     	for (JobOffer job:allJobs){
     		if (job.contain(word)){
