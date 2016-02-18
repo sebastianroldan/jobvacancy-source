@@ -566,4 +566,19 @@ public class JobOfferResourceTest {
         assertEquals("Junit",listJobOffer.get(0).getDescription());
         assertTrue(listJobOffer.size()==1);
     }
+    
+    @Test
+    @Transactional
+    public void searchIsEmptyMustReturnAllJobs() throws Exception {
+
+    	// Initialize the database
+        jobOfferRepository.saveAndFlush(jobOffer);
+        jobOfferRepository.saveAndFlush(jobOffer2);
+
+        JobOfferResource resource = new JobOfferResource();
+        List<JobOffer> list = jobOfferRepository.findAll();
+        List<JobOffer> listJobOffer = resource.search(list,"  ");           
+        
+        assertTrue(listJobOffer.size()==2);
+    }
 }

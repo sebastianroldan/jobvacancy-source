@@ -218,12 +218,17 @@ public class JobOfferResource {
             throws URISyntaxException {
     	List<JobOffer> allJobs = jobOfferRepository.findAll();
     	Page<JobOffer> page = createJobOfferPage(allJobs);
-    	if (isSearch){
+    	if (isSearch && !isEmptySearch(word)){
     		page = createJobOfferPage(search(allJobs,word));
     	}
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/offers");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
+    
+    private boolean isEmptySearch(String word) {
+    	Pattern regex = Pattern.compile("\\s+");
+        return (regex.matcher(word).matches()||word.equals(""));
+	}
 
 	public List<JobOffer> search(List<JobOffer> allJobs, String word){
     	List<JobOffer> lista = new LinkedList<JobOffer>();
