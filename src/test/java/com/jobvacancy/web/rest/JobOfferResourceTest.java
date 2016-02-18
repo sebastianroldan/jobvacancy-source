@@ -514,12 +514,35 @@ public class JobOfferResourceTest {
         List<JobOffer> list = jobOfferRepository.findAll();
         List<JobOffer> listJobOffer = resource.search(list,"an droid");           
         
-        assertEquals("Tester",listJobOffer.get(1).getTitle());
-        assertEquals("Lanus",listJobOffer.get(1).getLocation());
-        assertEquals("Junit",listJobOffer.get(1).getDescription());
         assertTrue(listJobOffer.size()==2);
         assertThat(listJobOffer.get(0).getTitle()).isEqualTo(DEFAULT_TITLE);
         assertThat(listJobOffer.get(0).getLocation()).isEqualTo(DEFAULT_LOCATION);
         assertThat(listJobOffer.get(0).getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
+        assertEquals("Tester",listJobOffer.get(1).getTitle());
+        assertEquals("Lanus",listJobOffer.get(1).getLocation());
+        assertEquals("Junit",listJobOffer.get(1).getDescription());
     }
+    
+    @Test
+    @Transactional
+    public void searchAWordIncludeInTitle() throws Exception {
+
+        jobOffer2.setTags("apps");
+        jobOffer2.setTitle("Movil");
+        jobOffer.setTags("android");
+        
+        // Initialize the database
+        jobOfferRepository.saveAndFlush(jobOffer);
+        jobOfferRepository.saveAndFlush(jobOffer2);
+
+        JobOfferResource resource = new JobOfferResource();
+        List<JobOffer> list = jobOfferRepository.findAll();
+        List<JobOffer> listJobOffer = resource.search(list,"Movil");           
+        
+        assertEquals("Movil",listJobOffer.get(0).getTitle());
+        assertEquals("Lanus",listJobOffer.get(0).getLocation());
+        assertEquals("Junit",listJobOffer.get(0).getDescription());
+        assertTrue(listJobOffer.size()==1);
+    }
+    
 }
