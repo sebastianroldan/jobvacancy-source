@@ -6,7 +6,11 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 /**
  * A JobOffer.
@@ -74,7 +78,7 @@ public class JobOffer implements Serializable {
     }
 
     public void setTags(String tags) {
-        this.tags = tags;
+    	this.tags = tags;
     }
 
     public User getOwner() {
@@ -117,7 +121,7 @@ public class JobOffer implements Serializable {
     }
 
 	public boolean hasTags() {
-		return (tags.length()>0);
+		return (numberOfTags()>0);
 	}
 
 	public int numberOfTags() {
@@ -126,5 +130,44 @@ public class JobOffer implements Serializable {
 		}else{
 			return tags.split(",").length;
 		}
+	}
+	
+	public List<String> tagList(){
+		int lengthArray = tags.split(",").length;
+		List<String> tagList = new LinkedList<String>();
+		String[] tagArray = new String[lengthArray];
+		tagArray = tags.split(",");
+		for (int i=1; i< tagArray.length; i++){
+			tagArray[i]=tagArray[i].substring(1);
+		}
+		tagList = Arrays.asList(tagArray);
+		return tagList;
+	}
+
+	public boolean validate() {
+		if (tags == null){
+			tags = "";
+		}
+		Pattern regex = Pattern.compile("(\\w+(\\s\\w+)*(\\,\\s\\w+(\\s\\w+)*)*)|\\w+(\\s\\w+)*|\\s+");
+        return regex.matcher(tags).matches()||!this.hasTags();
+	}
+
+	public boolean contain(String word) {
+		return (this.upperCaseAndSuppresWhiteSpacesTags().contains(
+							this.supressWhiteSpaces(word).toUpperCase()));
+	}
+	
+	private List<String> upperCaseAndSuppresWhiteSpacesTags(){
+		List<String> list = new LinkedList<String>();
+		String modifiedTag;
+		for (String tag:this.tagList()){
+			modifiedTag = supressWhiteSpaces(tag);
+			list.add(modifiedTag.toUpperCase());
+		}
+		return list;
+	}
+
+	public String supressWhiteSpaces(String word) {
+		return word.replaceAll("\\s", "");
 	}
 }

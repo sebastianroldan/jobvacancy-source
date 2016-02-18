@@ -5,6 +5,7 @@ angular.module('jobvacancyApp').controller('JobOfferDialogController',
         function($scope, $stateParams, $modalInstance, entity, JobOffer, User) {
 
         $scope.jobOffer = entity;
+        $scope.regex = /(\w+(\s\w+)*(\,\s\w+(\s\w+)*)*)|\w+(\s\w+)*|\s+/g;
         $scope.users = User.query();
         $scope.load = function(id) {
             JobOffer.get({id : id}, function(result) {

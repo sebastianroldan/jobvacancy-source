@@ -7,10 +7,8 @@ import com.jobvacancy.repository.JobOfferRepository;
 
 import com.jobvacancy.repository.UserRepository;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.*;
 
 import org.mockito.Mock;
@@ -76,6 +74,8 @@ public class JobOfferResourceTest {
     private MockMvc restJobOfferMockMvc;
 
     private JobOffer jobOffer;
+    private JobOffer jobOffer2;
+    
     @PostConstruct
     public void setup() {
         MockitoAnnotations.initMocks(this);
@@ -92,13 +92,18 @@ public class JobOfferResourceTest {
             .setMessageConverters(jacksonMessageConverter).build();
     }
 
-
     @Before
     public void initTest() {
         jobOffer = new JobOffer();
         jobOffer.setTitle(DEFAULT_TITLE);
         jobOffer.setLocation(DEFAULT_LOCATION);
         jobOffer.setDescription(DEFAULT_DESCRIPTION);
+        jobOffer.setTags("");
+        jobOffer2 = new JobOffer();
+    	jobOffer2.setTitle("Tester");
+        jobOffer2.setLocation("Lanus");
+        jobOffer2.setDescription("Junit");
+
     }
 
     public static class MockSecurityContext implements SecurityContext {
@@ -146,28 +151,178 @@ public class JobOfferResourceTest {
     @Test
     @Transactional
     public void createJobOfferWithoutTags() throws Exception {
-        int databaseSizeBeforeCreate = jobOfferRepository.findAll().size();
+        jobOfferRepository.findAll().size();
 
         // Create the JobOffer
-        jobOffer.setTags("");
+        jobOffer.setTags(null);
+        restJobOfferMockMvc.perform(post("/api/jobOffers")
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(jobOffer)))
+                .andExpect(status().isCreated());
+        
+        List<JobOffer> jobOffers = jobOfferRepository.findAll();
+        JobOffer testJobOffer = jobOffers.get(jobOffers.size() - 1);
+        assertEquals(0,testJobOffer.numberOfTags());
+        assertFalse(testJobOffer.hasTags());
+    }
+    
+    @Test
+    @Transactional
+    public void createJobOfferWithOneTag() throws Exception {
+        jobOfferRepository.findAll().size();
+
+        // Create the JobOffer
+        jobOffer.setTags("java");
+        restJobOfferMockMvc.perform(post("/api/jobOffers")
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(jobOffer)))
+                .andExpect(status().isCreated());
+        
+        List<JobOffer> jobOffers = jobOfferRepository.findAll();
+        JobOffer testJobOffer = jobOffers.get(jobOffers.size() - 1);
+        assertEquals(1,testJobOffer.numberOfTags());
+        assertTrue(testJobOffer.hasTags());
+        assertEquals("java",testJobOffer.tagList().get(0));
+    }
+    
+    @Test
+    @Transactional
+    public void createJobOfferWithMoreThanOneTag() throws Exception {
+        jobOfferRepository.findAll().size();
+
+        // Create the JobOffer
+        jobOffer.setTags("java, spring, hibernate");
         restJobOfferMockMvc.perform(post("/api/jobOffers")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
                 .content(TestUtil.convertObjectToJsonBytes(jobOffer)))
                 .andExpect(status().isCreated());
 
-      
-        // Validate the JobOffer in the database
-        
         List<JobOffer> jobOffers = jobOfferRepository.findAll();
-        assertThat(jobOffers).hasSize(databaseSizeBeforeCreate + 1);
         JobOffer testJobOffer = jobOffers.get(jobOffers.size() - 1);
-        assertThat(testJobOffer.getTitle()).isEqualTo(DEFAULT_TITLE);
-        assertThat(testJobOffer.getLocation()).isEqualTo(DEFAULT_LOCATION);
-        assertThat(testJobOffer.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
-        assertEquals(0,testJobOffer.numberOfTags());
-        assertFalse(testJobOffer.hasTags());
+        
+        assertEquals(3,testJobOffer.numberOfTags());
+        assertTrue(testJobOffer.hasTags());
+        assertEquals("java",testJobOffer.tagList().get(0));
+        assertEquals("spring",testJobOffer.tagList().get(1));
+        assertEquals("hibernate",testJobOffer.tagList().get(2));
+    }
+
+    @Test
+    @Transactional
+    public void createJobOfferWithMoreThanOneTagAndWhiteSpacesBetween() throws Exception {
+        jobOfferRepository.findAll().size();
+
+        // Create the JobOffer
+        jobOffer.setTags("Google Maps, Games");
+        restJobOfferMockMvc.perform(post("/api/jobOffers")
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(jobOffer)))
+                .andExpect(status().isCreated());
+
+        List<JobOffer> jobOffers = jobOfferRepository.findAll();
+        JobOffer testJobOffer = jobOffers.get(jobOffers.size() - 1);
+        
+        assertEquals(2,testJobOffer.numberOfTags());
+        assertTrue(testJobOffer.hasTags());
+        assertEquals("Google Maps",testJobOffer.tagList().get(0));
+        assertEquals("Games",testJobOffer.tagList().get(1));
+    }
+
+    @Test
+    @Transactional
+    public void createJobOfferTagsWhiteSpacesBetween() throws Exception {
+        jobOfferRepository.findAll().size();
+
+        // Create the JobOffer
+        jobOffer.setTags("Apps, google maps, git, project manager");
+        restJobOfferMockMvc.perform(post("/api/jobOffers")
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(jobOffer)))
+                .andExpect(status().isCreated());
+
+        List<JobOffer> jobOffers = jobOfferRepository.findAll();
+        JobOffer testJobOffer = jobOffers.get(jobOffers.size() - 1);
+        
+        assertEquals(4,testJobOffer.numberOfTags());
+        assertTrue(testJobOffer.hasTags());
+        assertEquals("Apps",testJobOffer.tagList().get(0));
+        assertEquals("google maps",testJobOffer.tagList().get(1));
+        assertEquals("git",testJobOffer.tagList().get(2));
+        assertEquals("project manager",testJobOffer.tagList().get(3));
     }
     
+    @Test
+    @Transactional
+    public void checkTagsWithSpecialCharsAreNotValidate() throws Exception {
+        int databaseSizeBeforeTest = jobOfferRepository.findAll().size();
+        // set the field tags
+        jobOffer.setTags("%&/");
+
+        // Create the JobOffer, which fails.
+
+        restJobOfferMockMvc.perform(post("/api/jobOffers")
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(jobOffer)))
+                .andExpect(status().isBadRequest());
+
+        List<JobOffer> jobOffers = jobOfferRepository.findAll();
+        assertThat(jobOffers).hasSize(databaseSizeBeforeTest);
+    }
+    
+    @Test
+    @Transactional
+    public void checkTagsWithoutWhiteSpaceAfterCommaAreNotValidate() throws Exception {
+        int databaseSizeBeforeTest = jobOfferRepository.findAll().size();
+        // set the field tags
+        jobOffer.setTags("java,spring, junior");
+
+        // Create the JobOffer, which fails.
+
+        restJobOfferMockMvc.perform(post("/api/jobOffers")
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(jobOffer)))
+                .andExpect(status().isBadRequest());
+
+        List<JobOffer> jobOffers = jobOfferRepository.findAll();
+        assertThat(jobOffers).hasSize(databaseSizeBeforeTest);
+    }
+    
+    @Test
+    @Transactional
+    public void checkTagsWithTwoCommaAreNotValidate() throws Exception {
+        int databaseSizeBeforeTest = jobOfferRepository.findAll().size();
+        // set the field tags
+        jobOffer.setTags("java, , spring");
+
+        // Create the JobOffer, which fails.
+
+        restJobOfferMockMvc.perform(post("/api/jobOffers")
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(jobOffer)))
+                .andExpect(status().isBadRequest());
+
+        List<JobOffer> jobOffers = jobOfferRepository.findAll();
+        assertThat(jobOffers).hasSize(databaseSizeBeforeTest);
+    }
+    
+    @Test
+    @Transactional
+    public void checkTagsWhithoutWhiteSpacesAfterCommaAreNotValidate() throws Exception {
+        int databaseSizeBeforeTest = jobOfferRepository.findAll().size();
+        // set the field tags
+        jobOffer.setTags("java,spring");
+
+        // Create the JobOffer, which fails.
+
+        restJobOfferMockMvc.perform(post("/api/jobOffers")
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(jobOffer)))
+                .andExpect(status().isBadRequest());
+
+        List<JobOffer> jobOffers = jobOfferRepository.findAll();
+        assertThat(jobOffers).hasSize(databaseSizeBeforeTest);
+    }
+
     @Test
     @Transactional
     public void checkTitleIsRequired() throws Exception {
@@ -185,24 +340,7 @@ public class JobOfferResourceTest {
         List<JobOffer> jobOffers = jobOfferRepository.findAll();
         assertThat(jobOffers).hasSize(databaseSizeBeforeTest);
     }
-
-    @Test
-    @Ignore
-    @Transactional
-    public void getAllJobOffers() throws Exception {
-        // Initialize the database
-        jobOfferRepository.saveAndFlush(jobOffer);
-
-        // Get all the jobOffers
-        restJobOfferMockMvc.perform(get("/api/jobOffers"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(jobOffer.getId().intValue())))
-                .andExpect(jsonPath("$.[*].title").value(hasItem(DEFAULT_TITLE.toString())))
-                .andExpect(jsonPath("$.[*].location").value(hasItem(DEFAULT_LOCATION.toString())))
-                .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION.toString())));
-    }
-
+    
     @Test
     @Transactional
     public void getJobOffer() throws Exception {
@@ -240,7 +378,6 @@ public class JobOfferResourceTest {
         jobOffer.setLocation(UPDATED_LOCATION);
         jobOffer.setDescription(UPDATED_DESCRIPTION);
 
-
         restJobOfferMockMvc.perform(put("/api/jobOffers")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
                 .content(TestUtil.convertObjectToJsonBytes(jobOffer)))
@@ -271,5 +408,118 @@ public class JobOfferResourceTest {
         // Validate the database is empty
         List<JobOffer> jobOffers = jobOfferRepository.findAll();
         assertThat(jobOffers).hasSize(databaseSizeBeforeDelete - 1);
+    }
+    
+    @Test
+    @Transactional
+    public void searchSimpleWordJava() throws Exception {
+
+        jobOffer2.setTags("java");
+    	
+        // Initialize the database
+        jobOfferRepository.saveAndFlush(jobOffer);
+        jobOfferRepository.saveAndFlush(jobOffer2);
+
+        JobOfferResource resource = new JobOfferResource();
+        List<JobOffer> list = jobOfferRepository.findAll();
+        List<JobOffer> listJobOffer = resource.search(list,"java");
+        assertEquals("Tester",listJobOffer.get(0).getTitle());
+        assertEquals("Lanus",listJobOffer.get(0).getLocation());
+        assertEquals("Junit",listJobOffer.get(0).getDescription());
+        assertTrue(listJobOffer.size()==1);   
+    }
+    
+    @Test
+    @Transactional
+    public void searchAWordWithCapitalLetters() throws Exception {
+
+        jobOffer2.setTags("java, hibernate, JUNIT");
+        
+        // Initialize the database
+        jobOfferRepository.saveAndFlush(jobOffer);
+        jobOfferRepository.saveAndFlush(jobOffer2);
+
+        JobOfferResource resource = new JobOfferResource();
+        List<JobOffer> list = jobOfferRepository.findAll();
+        List<JobOffer> listJobOffer = resource.search(list,"junit");
+        
+        assertEquals("Tester",listJobOffer.get(0).getTitle());
+        assertEquals("Lanus",listJobOffer.get(0).getLocation());
+        assertEquals("Junit",listJobOffer.get(0).getDescription());
+        assertTrue(listJobOffer.size()==1);
+    }
+    
+    @Test
+    @Transactional
+    public void searchAWordWithCapitalLettersBetween() throws Exception {
+
+    	jobOffer.setTags("android, iOs");
+        jobOffer2.setTags("apps, web, IOS, android");
+        
+        // Initialize the database
+        jobOfferRepository.saveAndFlush(jobOffer);
+        jobOfferRepository.saveAndFlush(jobOffer2);
+
+        JobOfferResource resource = new JobOfferResource();
+        List<JobOffer> list = jobOfferRepository.findAll();
+        List<JobOffer> listJobOffer = resource.search(list,"IOS");
+
+        assertEquals("Tester",listJobOffer.get(1).getTitle());
+        assertEquals("Lanus",listJobOffer.get(1).getLocation());
+        assertEquals("Junit",listJobOffer.get(1).getDescription());
+        assertTrue(listJobOffer.size()==2);
+        assertThat(listJobOffer.get(0).getTitle()).isEqualTo(DEFAULT_TITLE);
+        assertThat(listJobOffer.get(0).getLocation()).isEqualTo(DEFAULT_LOCATION);
+        assertThat(listJobOffer.get(0).getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
+    }
+    
+    @Test
+    @Transactional
+    public void searchAWordWithWhiteSpacesBetween() throws Exception {
+
+    	JobOffer jobOffer2 = new JobOffer();
+    	jobOffer2.setTitle("Test");
+        jobOffer2.setLocation("Quilmes");
+        jobOffer2.setDescription("Junit");
+        jobOffer2.setTags("java, hibernate, project manajer");
+        
+        // Initialize the database
+        jobOfferRepository.saveAndFlush(jobOffer);
+        jobOfferRepository.saveAndFlush(jobOffer2);
+
+        JobOfferResource resource = new JobOfferResource();
+        List<JobOffer> list = jobOfferRepository.findAll();
+        List<JobOffer> listJobOffer = resource.search(list,"PROJECT MANAJER");
+        
+        assertEquals("Test",listJobOffer.get(0).getTitle());
+        assertEquals("Quilmes",listJobOffer.get(0).getLocation());
+        assertEquals("Junit",listJobOffer.get(0).getDescription());
+        assertTrue(listJobOffer.size()==1);
+        
+    }
+    
+    
+    @Test
+    @Transactional
+    public void searchASingleWordSeparateWhiteSpacesBetween() throws Exception {
+
+        jobOffer2.setTags("apps, web, Unit Test, android");
+        jobOffer.setTags("android, unit TEST");
+        
+        // Initialize the database
+        jobOfferRepository.saveAndFlush(jobOffer);
+        jobOfferRepository.saveAndFlush(jobOffer2);
+
+        JobOfferResource resource = new JobOfferResource();
+        List<JobOffer> list = jobOfferRepository.findAll();
+        List<JobOffer> listJobOffer = resource.search(list,"an droid");           
+        
+        assertEquals("Tester",listJobOffer.get(1).getTitle());
+        assertEquals("Lanus",listJobOffer.get(1).getLocation());
+        assertEquals("Junit",listJobOffer.get(1).getDescription());
+        assertTrue(listJobOffer.size()==2);
+        assertThat(listJobOffer.get(0).getTitle()).isEqualTo(DEFAULT_TITLE);
+        assertThat(listJobOffer.get(0).getLocation()).isEqualTo(DEFAULT_LOCATION);
+        assertThat(listJobOffer.get(0).getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
     }
 }
