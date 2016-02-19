@@ -13,9 +13,9 @@ Feature: Como usuario quiero que la busqueda de jobs, tenga en cuenta las descri
 		Then la oferta X se muestra en los resultados.
 		
 	Scenario: El usuario realiza una busqueda con una palabra contenida en la descripcion, en el titulo y en los tags de diferentes ofertas.
-		Given el usuarios busca la palabra "Apps" 
+		Given el usuarios busca la palabra "apps" 
 		And la oferta X posee la descripcion "Desarrollo de apps para IOs y Android"
 		And la oferta Y posee el titulo "Android Apps"
-		And la oferta z posee los tags "Apps", "movil", "Android"
+		And la oferta z posee los tags "APPS", "movil", "Android"
 		When la busqueda es realizada
 		Then las tres ofertas se muestran en los resultados.

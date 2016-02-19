@@ -581,4 +581,27 @@ public class JobOfferResourceTest {
         
         assertTrue(listJobOffer.size()==2);
     }
+    
+    @Test
+    @Transactional
+    public void searchAWordIncludeInDescription() throws Exception {
+
+        jobOffer2.setTags("android, ios");
+        jobOffer2.setTitle("Aplicaciones moviles");
+        jobOffer2.setDescription("Desarrollo de apps para IOs y Android");
+        jobOffer.setTags("android");
+        
+        // Initialize the database
+        jobOfferRepository.saveAndFlush(jobOffer);
+        jobOfferRepository.saveAndFlush(jobOffer2);
+
+        JobOfferResource resource = new JobOfferResource();
+        List<JobOffer> list = jobOfferRepository.findAll();
+        List<JobOffer> listJobOffer = resource.search(list,"APPS");           
+        
+        assertEquals("Aplicaciones moviles",listJobOffer.get(0).getTitle());
+        assertEquals("Lanus",listJobOffer.get(0).getLocation());
+        assertEquals("Desarrollo de apps para IOs y Android",listJobOffer.get(0).getDescription());
+        assertTrue(listJobOffer.size()==1);
+    }
 }

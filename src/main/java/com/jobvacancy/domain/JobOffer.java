@@ -152,9 +152,17 @@ public class JobOffer implements Serializable {
 	}
 
 	public boolean contain(String word) {
-		return (containTag(word)||containTitle(word));
+		return (containTag(word)||containTitle(word)||containDescription(word));
 	}
 	
+	private boolean containDescription(String word) {
+		return descriptionWordList().contains(word.toUpperCase());
+	}
+
+	private List<String> descriptionWordList() {
+		return convertToUpperCaseList(this.getDescription());
+	}
+
 	private boolean containTitle(String word) {
 		return titleWordList().contains(word.toUpperCase());
 	}
