@@ -6,6 +6,8 @@ import com.jobvacancy.domain.User;
 import com.jobvacancy.repository.JobOfferRepository;
 import com.jobvacancy.repository.UserRepository;
 import com.jobvacancy.security.SecurityUtils;
+import com.jobvacancy.seeker.Seeker;
+import com.jobvacancy.seeker.SeekerJob;
 import com.jobvacancy.web.rest.util.HeaderUtil;
 import com.jobvacancy.web.rest.util.PaginationUtil;
 import org.slf4j.Logger;
@@ -231,13 +233,11 @@ public class JobOfferResource {
 	}
 
 	public List<JobOffer> search(List<JobOffer> allJobs, String word){
-    	List<JobOffer> lista = new LinkedList<JobOffer>();
-    	for (JobOffer job:allJobs){
-    		if (job.contain(word)){
-    			lista.add(job);
-    		}
-    	}	
-    	return lista;
+    	if (isEmptySearch(word)){
+    		return allJobs;
+    	}
+		SeekerJob seeker = Seeker.getSeeker(word);	
+    	return seeker.search(allJobs, word);
     }
 
 }

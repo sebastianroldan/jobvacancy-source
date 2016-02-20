@@ -499,7 +499,6 @@ public class JobOfferResourceTest {
         
     }
     
-    
     @Test
     @Transactional
     public void searchASingleWordSeparateWhiteSpacesBetween() throws Exception {
@@ -603,5 +602,89 @@ public class JobOfferResourceTest {
         assertEquals("Lanus",listJobOffer.get(0).getLocation());
         assertEquals("Desarrollo de apps para IOs y Android",listJobOffer.get(0).getDescription());
         assertTrue(listJobOffer.size()==1);
+    }
+    
+    @Test
+    @Transactional
+    public void searchAWordIncludeInDescriptionTagsAndTitle() throws Exception {
+
+        jobOffer2.setTags("android, ios");
+        jobOffer2.setTitle("Aplicaciones moviles");
+        jobOffer2.setDescription("Desarrollo de apps para IOs y Android");
+        jobOffer.setTags("android");
+        JobOffer jobOffer3 = new JobOffer();
+        jobOffer3.setTitle("Desarrollo en android");
+        jobOffer3.setDescription("Apps para moviles");
+        jobOffer3.setLocation("San Justo");
+        jobOffer3.setTags("apps, movil");
+        // Initialize the database
+        jobOfferRepository.saveAndFlush(jobOffer);
+        jobOfferRepository.saveAndFlush(jobOffer2);
+        jobOfferRepository.saveAndFlush(jobOffer3);
+        
+        JobOfferResource resource = new JobOfferResource();
+        List<JobOffer> list = jobOfferRepository.findAll();
+        List<JobOffer> listJobOffer = resource.search(list,"AndRoid");           
+        
+        assertTrue(listJobOffer.size()==3);
+        assertThat(listJobOffer.get(0).getTitle()).isEqualTo(DEFAULT_TITLE);
+        assertThat(listJobOffer.get(0).getLocation()).isEqualTo(DEFAULT_LOCATION);
+        assertThat(listJobOffer.get(0).getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
+        assertEquals("Aplicaciones moviles",listJobOffer.get(1).getTitle());
+        assertEquals("Lanus",listJobOffer.get(1).getLocation());
+        assertEquals("Desarrollo de apps para IOs y Android",listJobOffer.get(1).getDescription());
+        assertEquals("Desarrollo en android",listJobOffer.get(2).getTitle());
+        assertEquals("San Justo",listJobOffer.get(2).getLocation());
+        assertEquals("Apps para moviles",listJobOffer.get(2).getDescription());
+    }
+    
+    @Test
+    @Transactional
+    public void searchWhitANDOperator() throws Exception {
+    	
+    	jobOffer.setTitle("Tester java");
+    	jobOffer.setDescription("Programador java para testeo de aplicaciones");
+    	jobOffer.setTags("java, junit, tester, android");
+    	jobOffer2.setTitle("Desarrollo movil");
+    	jobOffer2.setDescription("Desarrollador juniors para aplicaciones movil y juegos");
+    	jobOffer2.setTags("Apps, android, ios, movil");
+    	
+        // Initialize the database
+        jobOfferRepository.saveAndFlush(jobOffer);
+        jobOfferRepository.saveAndFlush(jobOffer2);
+        
+        JobOfferResource resource = new JobOfferResource();
+        List<JobOffer> list = jobOfferRepository.findAll();
+        List<JobOffer> listJobOffer = resource.search(list,"JAVA AND junit");           
+        
+        assertEquals(1,listJobOffer.size());
+        assertThat(listJobOffer.get(0).getTitle()).isEqualTo("Tester java");
+        assertThat(listJobOffer.get(0).getLocation()).isEqualTo(DEFAULT_LOCATION);
+        assertThat(listJobOffer.get(0).getDescription()).isEqualTo("Programador java para testeo de aplicaciones");
+    }
+    
+    @Test
+    @Transactional
+    public void searchWhitOperatorAnd() throws Exception {
+    	
+    	jobOffer.setTitle("Tester java");
+    	jobOffer.setDescription("Programador java para testeo de aplicaciones");
+    	jobOffer.setTags("java, junit, tester, android");
+    	jobOffer2.setTitle("Desarrollo movil");
+    	jobOffer2.setDescription("Desarrollador juniors para aplicaciones movil y juegos");
+    	jobOffer2.setTags("Apps, android, ios, movil");
+    	
+        // Initialize the database
+        jobOfferRepository.saveAndFlush(jobOffer);
+        jobOfferRepository.saveAndFlush(jobOffer2);
+        
+        JobOfferResource resource = new JobOfferResource();
+        List<JobOffer> list = jobOfferRepository.findAll();
+        List<JobOffer> listJobOffer = resource.search(list,"tester and programador");           
+        
+        assertEquals(1,listJobOffer.size());
+        assertThat(listJobOffer.get(0).getTitle()).isEqualTo("Tester java");
+        assertThat(listJobOffer.get(0).getLocation()).isEqualTo(DEFAULT_LOCATION);
+        assertThat(listJobOffer.get(0).getDescription()).isEqualTo("Programador java para testeo de aplicaciones");
     }
 }

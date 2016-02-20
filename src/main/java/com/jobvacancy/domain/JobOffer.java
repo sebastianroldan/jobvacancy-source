@@ -2,6 +2,9 @@ package com.jobvacancy.domain;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import com.jobvacancy.service.JobOfferService;
+
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.io.Serializable;
@@ -152,51 +155,7 @@ public class JobOffer implements Serializable {
 	}
 
 	public boolean contain(String word) {
-		return (containTag(word)||containTitle(word)||containDescription(word));
-	}
-	
-	private boolean containDescription(String word) {
-		return descriptionWordList().contains(word.toUpperCase());
-	}
-
-	private List<String> descriptionWordList() {
-		return convertToUpperCaseList(this.getDescription());
-	}
-
-	private boolean containTitle(String word) {
-		return titleWordList().contains(word.toUpperCase());
-	}
-
-	private boolean containTag(String word){
-		return this.upperCaseAndSuppresWhiteSpacesListAWords(this.tagList()).contains(
-				this.supressWhiteSpaces(word).toUpperCase());
-	}
-	
-	private List<String> upperCaseAndSuppresWhiteSpacesListAWords(List<String> words){
-		List<String> list = new LinkedList<String>();
-		String modifiedWord;
-		for (String word:words){
-			modifiedWord = supressWhiteSpaces(word);
-			list.add(modifiedWord.toUpperCase());
-		}
-		return list;
-	}
-
-	private List<String> titleWordList(){
-		return convertToUpperCaseList(this.getTitle());
-	}
-	
-	private List<String> convertToUpperCaseList(String title) {
-		List<String> list = new LinkedList<String>();
-		String[] array = title.split("\\s+");
-		for (int i=0;i< array.length; i++){
-			array[i]=array[i].toUpperCase();
-		}
-		list = Arrays.asList(array);
-		return list;
-	}
-
-	public String supressWhiteSpaces(String word) {
-		return word.replaceAll("\\s", "");
+		JobOfferService service = new JobOfferService(this);
+		return (service.contain(word));
 	}
 }

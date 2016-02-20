@@ -33,13 +33,6 @@ public class JobOfferTest {
 	}
 	
 	@Test
-	public void tagListMustContainOneTag(){
-		jobOffer.setTags("java");
-		assertEquals(1,jobOffer.tagList().size());
-		assertTrue(jobOffer.tagList().contains("java"));
-	}
-	
-	@Test
 	public void specialCharacterAreNotValid(){
 		jobOffer.setTags("%&/");
 		assertFalse(jobOffer.validate());
@@ -80,8 +73,10 @@ public class JobOfferTest {
 	}
 	
 	@Test
-	public void supressWhiteSpacesTest(){
-		String sinespacios = jobOffer.supressWhiteSpaces("boca juniors");
-		assertEquals("bocajuniors",sinespacios);
+	public void tagListMustContainOneTag(){
+		jobOffer.setTags("java");
+		assertEquals(1,jobOffer.tagList().size());
+		assertTrue(jobOffer.contain("java"));
 	}
+
 }
