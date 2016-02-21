@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.jobvacancy.domain.JobOffer;
 
-public class AdvancedSearchOperatorAnd implements SeekerJob {
+public class AdvancedSeekerOperatorAnd implements SeekerJob {
 
 	private List<String> searchWords;
 	

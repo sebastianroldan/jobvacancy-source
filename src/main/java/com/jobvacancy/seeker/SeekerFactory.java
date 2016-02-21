@@ -2,13 +2,13 @@ package com.jobvacancy.seeker;
 
 import java.util.regex.Pattern;
 
-public class Seeker {
+public class SeekerFactory {
 
 	private static Pattern regex;
 	
 	public static SeekerJob getSeeker(String word) {
         if (isAdvancedSearch(word)){
-        	return new AdvancedSearchOperatorAnd();
+        	return new AdvancedSeekerOperatorAnd();
         }else{
         	return new SimpleSeekerJob();
         }

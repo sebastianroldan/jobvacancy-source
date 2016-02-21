@@ -6,7 +6,7 @@ import com.jobvacancy.domain.User;
 import com.jobvacancy.repository.JobOfferRepository;
 import com.jobvacancy.repository.UserRepository;
 import com.jobvacancy.security.SecurityUtils;
-import com.jobvacancy.seeker.Seeker;
+import com.jobvacancy.seeker.SeekerFactory;
 import com.jobvacancy.seeker.SeekerJob;
 import com.jobvacancy.web.rest.util.HeaderUtil;
 import com.jobvacancy.web.rest.util.PaginationUtil;
@@ -26,7 +26,6 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -236,7 +235,7 @@ public class JobOfferResource {
     	if (isEmptySearch(word)){
     		return allJobs;
     	}
-		SeekerJob seeker = Seeker.getSeeker(word);	
+		SeekerJob seeker = SeekerFactory.getSeeker(word);	
     	return seeker.search(allJobs, word);
     }
 
