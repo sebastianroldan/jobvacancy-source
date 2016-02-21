@@ -4,19 +4,24 @@ import java.util.regex.Pattern;
 
 public class SeekerFactory {
 
+	private static final String AND = "AND";
+	private static final String OR = "OR";
 	private static Pattern regex;
 	
 	public static SeekerJob getSeeker(String word) {
-        if (isAdvancedSearch(word)){
+        if (isAdvancedSearch(word, AND)){
         	return new AdvancedSeekerOperatorAnd();
         }else{
-        	return new SimpleSeekerJob();
+        	if (isAdvancedSearch(word, OR)){
+        		return new AdvancedSeekerOperatorOr();
+        	}else{
+        		return new SimpleSeekerJob();
+        	}
         }
 	}
 
-	private static boolean isAdvancedSearch(String word) {
-		regex = Pattern.compile("\\w+(\\s\\w+)*(\\s(AND)\\s\\w+(\\s\\w+)*)+");
+	private static boolean isAdvancedSearch(String word, String operator) {
+		regex = Pattern.compile("\\w+(\\s\\w+)*(\\s("+operator+")\\s\\w+(\\s\\w+)*)+");
 		return regex.matcher(word.toUpperCase()).matches();
 	}
-
 }

@@ -16,9 +16,24 @@ public class SeekerFactoryTest {
 	}
 	
 	@Test
-	public void getSeekerMustReturnAAdvancedSeekerOperatorAndTest(){
+	public void returnASimpleSeekerJobTest(){
+		word = "android apps";
+		SeekerJob seeker = SeekerFactory.getSeeker(word);
+		assertEquals(SimpleSeekerJob.class,seeker.getClass());
+	}
+	
+	@Test
+	public void getSeekerMustReturnAAdvancedSeekerOperatorANDTest(){
 		word = "java AND junit";
 		SeekerJob seeker = SeekerFactory.getSeeker(word);
 		assertEquals(AdvancedSeekerOperatorAnd.class,seeker.getClass());
 	}
+	
+	@Test
+	public void getSeekerMustReturnAAdvancedSeekerOperatorORTest(){
+		word = "android OR movil";
+		SeekerJob seeker = SeekerFactory.getSeeker(word);
+		assertEquals(AdvancedSeekerOperatorOr.class,seeker.getClass());
+	}
+	
 }

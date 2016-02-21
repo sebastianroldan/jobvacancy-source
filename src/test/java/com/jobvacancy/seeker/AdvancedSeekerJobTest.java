@@ -53,7 +53,7 @@ public class AdvancedSeekerJobTest {
 	
 	@Test
     @Transactional
-    public void searchWhitANDOperator() throws Exception {
+    public void searchWithANDOperator() throws Exception {
     	
     	jobOffer.setTitle("Tester java");
     	jobOffer.setDescription("Programador java para testeo de aplicaciones");
@@ -78,7 +78,7 @@ public class AdvancedSeekerJobTest {
     
     @Test
     @Transactional
-    public void searchWhitOperatorAnd() throws Exception {
+    public void searchWithOperatorAnd() throws Exception {
     	
     	jobOffer.setTitle("Tester java");
     	jobOffer.setDescription("Programador java para testeo de aplicaciones");
@@ -100,5 +100,108 @@ public class AdvancedSeekerJobTest {
         assertThat(listJobOffer.get(0).getLocation()).isEqualTo(DEFAULT_LOCATION);
         assertThat(listJobOffer.get(0).getDescription()).isEqualTo("Programador java para testeo de aplicaciones");
     }
-
+    
+    @Test
+    @Transactional
+    public void searchOperatorAndWithWordsInDescriptionAndTitle() throws Exception {
+    	
+    	jobOffer.setTitle("Desarrollo java");
+    	jobOffer.setDescription("Programador java para testeo de aplicaciones");
+    	jobOffer.setTags("java, junit, tester, android");
+    	jobOffer2.setTitle("Desarrollo movil");
+    	jobOffer2.setDescription("Desarrollador juniors para aplicaciones movil y juegos");
+    	jobOffer2.setTags("Apps, android, ios, movil");
+    	
+        // Initialize the database
+        jobOfferRepository.saveAndFlush(jobOffer);
+        jobOfferRepository.saveAndFlush(jobOffer2);
+        
+        SeekerJob seeker = new AdvancedSeekerOperatorAnd();
+        List<JobOffer> list = jobOfferRepository.findAll();
+        List<JobOffer> listJobOffer = seeker.search(list,"desarrollo ANd APLICACIONES");           
+        
+        assertEquals(2,listJobOffer.size());
+        assertThat(listJobOffer.get(0).getTitle()).isEqualTo("Desarrollo java");
+        assertThat(listJobOffer.get(0).getLocation()).isEqualTo(DEFAULT_LOCATION);
+        assertThat(listJobOffer.get(0).getDescription()).isEqualTo("Programador java para testeo de aplicaciones");
+        assertThat(listJobOffer.get(1).getTitle()).isEqualTo("Desarrollo movil");
+        assertThat(listJobOffer.get(1).getLocation()).isEqualTo("Lanus");
+        assertThat(listJobOffer.get(1).getDescription()).isEqualTo("Desarrollador juniors para aplicaciones movil y juegos");
+    }
+    
+    @Test
+    @Transactional
+    public void searchMustReturnEmptyList() throws Exception {
+    	
+    	jobOffer.setTitle("Desarrollo java");
+    	jobOffer.setDescription("Programador java para testeo de aplicaciones");
+    	jobOffer.setTags("java, junit, tester, android");
+    	jobOffer2.setTitle("Desarrollo movil");
+    	jobOffer2.setDescription("Desarrollador juniors para aplicaciones movil y juegos");
+    	jobOffer2.setTags("Apps, android, ios, movil");
+    	
+        // Initialize the database
+        jobOfferRepository.saveAndFlush(jobOffer);
+        jobOfferRepository.saveAndFlush(jobOffer2);
+        
+        SeekerJob seeker = new AdvancedSeekerOperatorAnd();
+        List<JobOffer> list = jobOfferRepository.findAll();
+        List<JobOffer> listJobOffer = seeker.search(list,"desarrollo ANd APLICACIONES anD hibernate");           
+        
+        assertEquals(0,listJobOffer.size());
+    }
+    
+    @Test
+    @Transactional
+    public void searchMustReturnJobOffer2() throws Exception {
+    	
+    	jobOffer.setTitle("Desarrollo java");
+    	jobOffer.setDescription("Programador java para testeo de aplicaciones");
+    	jobOffer.setTags("java, junit, tester, android");
+    	jobOffer2.setTitle("Desarrollo movil");
+    	jobOffer2.setDescription("Desarrollador juniors para aplicaciones movil y juegos");
+    	jobOffer2.setTags("Apps, android, ios, movil");
+    	
+        // Initialize the database
+        jobOfferRepository.saveAndFlush(jobOffer);
+        jobOfferRepository.saveAndFlush(jobOffer2);
+        
+        SeekerJob seeker = new AdvancedSeekerOperatorAnd();
+        List<JobOffer> list = jobOfferRepository.findAll();
+        List<JobOffer> listJobOffer = seeker.search(list,"juniors ANd an droid anD desaRRollo");           
+        
+        assertEquals(1,listJobOffer.size());
+        
+        assertThat(listJobOffer.get(0).getTitle()).isEqualTo("Desarrollo movil");
+        assertThat(listJobOffer.get(0).getLocation()).isEqualTo("Lanus");
+        assertThat(listJobOffer.get(0).getDescription()).isEqualTo("Desarrollador juniors para aplicaciones movil y juegos");
+    }
+    
+    @Test
+    @Transactional
+    public void searchWithOperatorOr() throws Exception {
+    	
+    	jobOffer.setTitle("Tester java");
+    	jobOffer.setDescription("Programador java para testeo de aplicaciones");
+    	jobOffer.setTags("java, junit, tester, android");
+    	jobOffer2.setTitle("Desarrollo movil");
+    	jobOffer2.setDescription("Desarrollador juniors para aplicaciones movil y juegos");
+    	jobOffer2.setTags("Apps, android, ios, movil");
+    	
+        // Initialize the database
+        jobOfferRepository.saveAndFlush(jobOffer);
+        jobOfferRepository.saveAndFlush(jobOffer2);
+        
+        SeekerJob seeker = new AdvancedSeekerOperatorOr();
+        List<JobOffer> list = jobOfferRepository.findAll();
+        List<JobOffer> listJobOffer = seeker.search(list,"tester OR ios");           
+        
+        assertEquals(2,listJobOffer.size());
+        assertThat(listJobOffer.get(0).getTitle()).isEqualTo("Tester java");
+        assertThat(listJobOffer.get(0).getLocation()).isEqualTo(DEFAULT_LOCATION);
+        assertThat(listJobOffer.get(0).getDescription()).isEqualTo("Programador java para testeo de aplicaciones");
+        assertThat(listJobOffer.get(1).getTitle()).isEqualTo("Desarrollo movil");
+        assertThat(listJobOffer.get(1).getLocation()).isEqualTo("Lanus");
+        assertThat(listJobOffer.get(1).getDescription()).isEqualTo("Desarrollador juniors para aplicaciones movil y juegos");
+    }
 }
