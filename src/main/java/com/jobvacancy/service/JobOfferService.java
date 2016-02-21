@@ -19,7 +19,11 @@ public class JobOfferService {
 	}
 	
 	private boolean containDescription(String word) {
-		return descriptionWordList().contains(word.toUpperCase());
+		if (jobOffer.getDescription() == null){
+			return false;
+		}else{
+			return descriptionWordList().contains(this.supressWhiteSpaces(word).toUpperCase());
+		}
 	}
 
 	private List<String> descriptionWordList() {
@@ -27,12 +31,16 @@ public class JobOfferService {
 	}
 
 	private boolean containTitle(String word) {
-		return titleWordList().contains(word.toUpperCase());
+		return titleWordList().contains(this.supressWhiteSpaces(word).toUpperCase());
 	}
 
 	private boolean containTag(String word){
-		return this.upperCaseAndSuppresWhiteSpacesListAWords(jobOffer.tagList()).contains(
+		if (jobOffer.getTags() == null){
+			return false;
+		}else{
+			return this.upperCaseAndSuppresWhiteSpacesListAWords(jobOffer.tagList()).contains(
 				this.supressWhiteSpaces(word).toUpperCase());
+		}
 	}
 	
 	private List<String> upperCaseAndSuppresWhiteSpacesListAWords(List<String> words){
@@ -49,9 +57,9 @@ public class JobOfferService {
 		return convertToUpperCaseList(jobOffer.getTitle());
 	}
 	
-	private List<String> convertToUpperCaseList(String title) {
+	private List<String> convertToUpperCaseList(String text) {
 		List<String> list = new LinkedList<String>();
-		String[] array = title.split("\\s+");
+		String[] array = text.split("\\s+");
 		for (int i=0;i< array.length; i++){
 			array[i]=array[i].toUpperCase();
 		}

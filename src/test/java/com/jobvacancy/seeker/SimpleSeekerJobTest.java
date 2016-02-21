@@ -277,5 +277,52 @@ public class SimpleSeekerJobTest {
         assertEquals("San Justo",listJobOffer.get(2).getLocation());
         assertEquals("Apps para moviles",listJobOffer.get(2).getDescription());
     }
+    
+    @Test
+    @Transactional
+    public void searchInJobOfferWithDescriptionNull() throws Exception {
 
+        JobOffer jobOffer3 = new JobOffer();
+        jobOffer3.setTitle("Administrador de red");
+        jobOffer3.setLocation("San Justo");
+        jobOffer3.setTags("red");
+ 
+        // Initialize the database
+        jobOfferRepository.saveAndFlush(jobOffer);
+        jobOfferRepository.saveAndFlush(jobOffer2);
+        jobOfferRepository.saveAndFlush(jobOffer3);
+        
+        SeekerJob seeker = new SimpleSeekerJob();
+        List<JobOffer> list = jobOfferRepository.findAll();
+        List<JobOffer> listJobOffer = seeker.search(list,"red");           
+        
+        assertTrue(listJobOffer.size()==1);
+        assertThat(listJobOffer.get(0).getTitle()).isEqualTo("Administrador de red");
+        assertThat(listJobOffer.get(0).getLocation()).isEqualTo("San Justo");
+        assertThat(listJobOffer.get(0).getDescription()).isEqualTo(null);
+    }
+    
+    @Test
+    @Transactional
+    public void searchInJobOfferWithTagsNull() throws Exception {
+
+        JobOffer jobOffer3 = new JobOffer();
+        jobOffer3.setTitle("Administrador de red");
+        jobOffer3.setLocation("San Justo");
+ 
+        // Initialize the database
+        jobOfferRepository.saveAndFlush(jobOffer);
+        jobOfferRepository.saveAndFlush(jobOffer2);
+        jobOfferRepository.saveAndFlush(jobOffer3);
+        
+        SeekerJob seeker = new SimpleSeekerJob();
+        List<JobOffer> list = jobOfferRepository.findAll();
+        List<JobOffer> listJobOffer = seeker.search(list,"red");           
+        
+        assertTrue(listJobOffer.size()==1);
+        assertThat(listJobOffer.get(0).getTitle()).isEqualTo("Administrador de red");
+        assertThat(listJobOffer.get(0).getLocation()).isEqualTo("San Justo");
+        assertThat(listJobOffer.get(0).getTags()).isEqualTo(null);
+        assertThat(listJobOffer.get(0).getDescription()).isEqualTo(null);
+    }
 }

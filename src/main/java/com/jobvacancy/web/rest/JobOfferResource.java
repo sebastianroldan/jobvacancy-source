@@ -228,7 +228,11 @@ public class JobOfferResource {
     
     private boolean isEmptySearch(String word) {
     	Pattern regex = Pattern.compile("\\s+");
-        return (regex.matcher(word).matches()||word.equals(""));
+    	if (word != null){
+    		return (regex.matcher(word).matches()||word.equals(""));
+    	}else{
+    		return true;
+    	}
 	}
 
 	public List<JobOffer> search(List<JobOffer> allJobs, String word){
